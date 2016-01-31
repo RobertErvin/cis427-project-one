@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import projectPackage.Constants.CMDS;
+import projectPackage.Constants.RESPONSES;
 
 public class SocketServer {
 	/*
@@ -60,58 +61,60 @@ public class SocketServer {
 
                 while (true) {
                     String input = in.readLine();
+                    log(input);
+                    
                     if (isMsgStore) { // Store a message
                         if (user.isLoggedIn()) {
                             try {
                                 motdService.add(input);
                                 isMsgStore = false;
-                                out.println("200 OK");
+                                out.println(RESPONSES.OK.toString());
                             } catch (Exception e) {
                                 log(e.getMessage());
                             }
                         } else {
-                            out.println("401 You are not currently logged in, login first.");
+                            out.println(RESPONSES.LOGIN_ERROR.toString());
                         }
                     } else if (input.equals(CMDS.MSGGET.toString())) { // Request to store a message
                         String motd = motdService.getNext();
-                        out.println("200 OK");
+                        out.println(RESPONSES.OK.toString());
                         out.println(motd);
                     } else if (input.equals(CMDS.MSGSTORE.toString())) {
                         if (user.isLoggedIn()) {
                             isMsgStore = true;
-                            out.println("200 OK");
+                            out.println(RESPONSES.OK.toString());
                         } else {
-                            out.println("401 You are not currently logged in, login first.");
+                            out.println(RESPONSES.LOGIN_ERROR.toString());
                         }
                     } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                         try {
                             user = userService.parseUserAuthData(input);
                             user = userService.authorize(user);
-                            out.println("200 OK");
+                            out.println(RESPONSES.OK.toString());
                         } catch (IllegalArgumentException e) {
-                            out.println("410 Wrong UserID or Password");
+                            out.println(RESPONSES.BAD_USERNAME_OR_PASSWORD_ERROR.toString());
                         } catch (IllegalAccessError e) {
-                            out.println("401 You are already logged in, logout first.");
+                            out.println(RESPONSES.LOGOUT_ERROR.toString());
                         }
                     } else if (input.equals(CMDS.LOGOUT.toString())) { // Logout
                         try {
                             user = userService.logout(user);
-                            out.println("200 OK");
+                            out.println(RESPONSES.OK.toString());
                         } catch (IllegalAccessError e) {
-                            out.println("401 You are not currently logged in, login first.");
+                            out.println(RESPONSES.LOGIN_ERROR.toString());
                         }
                     } else if (input.equals(CMDS.QUIT.toString())) { // Quit
-                        out.println("200 OK");
+                        out.println(RESPONSES.OK.toString());
                         break;
                     } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
                         if (user.isRoot()) {
                             try {
                                 shutdown();
                             } catch (Exception e) {
-                                out.println("300 message format error");
+                                out.println(RESPONSES.FORMAT_ERROR.toString());
                             }
                         } else {
-                            out.println("402 User not allowed to execute this command.");
+                            out.println(RESPONSES.BAD_PERMISSIONS_ERROR.toString());
                         }
                     }
                 }
