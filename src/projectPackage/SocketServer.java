@@ -1,23 +1,21 @@
 package projectPackage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import projectPackage.Constants.CMDS;
 
 public class SocketServer {
-    public enum CMDS {
-        MSGGET,
-        MSGSTORE,
-        SHUTDOWN,
-        LOGIN,
-        LOGOUT,
-        QUIT
-    }
+	/*
+	 * The view for the socket. This handles
+	 * incoming requests and outgoing responses.
+	 */
 
+    // Initialize the socket and start listening
     public static void main(String[] args) throws Exception {
         System.out.println("The server is running...");
 
@@ -38,6 +36,7 @@ public class SocketServer {
         private MotdService motdService;
         private boolean isMsgStore = false;
 
+        // Initialize the variables
         public CIS427SocketServer(Socket socket) {
             this.socket = socket;
             this.user = new User();
@@ -52,6 +51,7 @@ public class SocketServer {
             log("New connection with client at " + socket);
         }
 
+        // Listen for the requests and handle them. Send corresponding responses.
         public void run() {
             try {
                 BufferedReader in = new BufferedReader(
@@ -60,7 +60,7 @@ public class SocketServer {
 
                 while (true) {
                     String input = in.readLine();
-                    if (isMsgStore) {
+                    if (isMsgStore) { // Store a message
                         if (user.isLoggedIn()) {
                             try {
                                 motdService.add(input);
@@ -72,7 +72,7 @@ public class SocketServer {
                         } else {
                             out.println("401 You are not currently logged in, login first.");
                         }
-                    } else if (input.equals(CMDS.MSGGET.toString())) {
+                    } else if (input.equals(CMDS.MSGGET.toString())) { // Request to store a message
                         String motd = motdService.getNext();
                         out.println("200 OK");
                         out.println(motd);
@@ -83,9 +83,9 @@ public class SocketServer {
                         } else {
                             out.println("401 You are not currently logged in, login first.");
                         }
-                    } else if (input.contains(CMDS.LOGIN.toString())) {
+                    } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                         try {
-                            user = parseUserAuthData(input);
+                            user = userService.parseUserAuthData(input);
                             user = userService.authorize(user);
                             out.println("200 OK");
                         } catch (IllegalArgumentException e) {
@@ -93,17 +93,17 @@ public class SocketServer {
                         } catch (IllegalAccessError e) {
                             out.println("401 You are already logged in, logout first.");
                         }
-                    } else if (input.equals(CMDS.LOGOUT.toString())) {
+                    } else if (input.equals(CMDS.LOGOUT.toString())) { // Logout
                         try {
                             user = userService.logout(user);
                             out.println("200 OK");
                         } catch (IllegalAccessError e) {
                             out.println("401 You are not currently logged in, login first.");
                         }
-                    } else if (input.equals(CMDS.QUIT.toString())) {
+                    } else if (input.equals(CMDS.QUIT.toString())) { // Quit
                         out.println("200 OK");
                         break;
-                    } else if (input.equals(CMDS.SHUTDOWN.toString())) {
+                    } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
                         if (user.isRoot()) {
                             try {
                                 shutdown();
@@ -114,12 +114,10 @@ public class SocketServer {
                             out.println("402 User not allowed to execute this command.");
                         }
                     }
-
-                    out.println(input.toUpperCase());
                 }
-            } catch (IOException e) {
+            } catch (IOException e) { // Something bad happened
                 log("Error handling client: " + e);
-            } finally {
+            } finally { // close stuff
                 try {
                     socket.close();
                 } catch (IOException e) {
@@ -127,23 +125,6 @@ public class SocketServer {
                 }
                 log("Connection with client closed");
             }
-        }
-
-        private User parseUserAuthData(String data) {
-            User user = new User();
-            Pattern pattern = Pattern.compile("(LOGIN\\s(\\w+)\\s(\\w+))");
-            Matcher matcher = pattern.matcher(data);
-            if (!matcher.find() || matcher.groupCount() < 4) {
-                throw new IllegalArgumentException();
-            }
-
-            String userId = matcher.group(1);
-            String password = matcher.group(2);
-
-            user.setId(userId);
-            user.setPassword(password);
-
-            return user;
         }
 
         private void shutdown() throws Exception {

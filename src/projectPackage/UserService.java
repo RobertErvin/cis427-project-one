@@ -1,11 +1,14 @@
 package projectPackage;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import projectPackage.SocketServer.CMDS;
+import projectPackage.Constants.CMDS;
+import projectPackage.User;
 
-/**
- * Created by robert on 1/31/16.
+/*
+ * Responsible for user-specific business logic
  */
 public class UserService {
     private ArrayList<User> users;
@@ -52,12 +55,13 @@ public class UserService {
         return users;
     }
 
+    // Verify a user is in the system and has access
     public User authorize(User userToAuth) {
         if (hasPermission(userToAuth, CMDS.LOGIN)) {
             for (User user : users) {
                 if (user.getId().equals(userToAuth.getId()) &&
                         user.getPassword().equals(userToAuth.getPassword())) {
-                    userToAuth.setStatus(User.USER_STATUS.LOGGED_IN);
+                    userToAuth.setStatus(User.USER_STATUS.AUTHORIZED);
                     return userToAuth;
                 }
             }
@@ -68,6 +72,7 @@ public class UserService {
         throw new IllegalAccessError("User doesn't have permission to login.");
     }
 
+    // Logout the user
     public User logout(User userToLogout) {
         if (hasPermission(userToLogout, CMDS.LOGOUT)) {
             userToLogout.setStatus(User.USER_STATUS.UNAUTHORIZED);
@@ -75,5 +80,23 @@ public class UserService {
         }
 
         throw new IllegalAccessError("User doesn't have permission to logout.");
+    }
+    
+    // Parse LOGIN userId and password to ensure it matches with the given format
+    public User parseUserAuthData(String data) {
+        User user = new User();
+        Pattern pattern = Pattern.compile("(LOGIN\\s(\\w+)\\s(\\w+))");
+        Matcher matcher = pattern.matcher(data);
+        if (!matcher.find() || matcher.groupCount() < 4) {
+            throw new IllegalArgumentException();
+        }
+
+        String userId = matcher.group(1);
+        String password = matcher.group(2);
+
+        user.setId(userId);
+        user.setPassword(password);
+
+        return user;
     }
 }

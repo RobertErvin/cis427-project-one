@@ -1,26 +1,30 @@
 package projectPackage;
 
-import projectPackage.SocketServer.CMDS;
+import projectPackage.Constants.CMDS;
 
+/*
+ * Responsible for all user-specific in-memory storage
+ * and permissions handling.
+ */
 public class User {
     public enum USER_STATUS {
         UNAUTHORIZED,
-        LOGGED_IN;
+        AUTHORIZED;
 
         public static CMDS[] getPermissions(USER_STATUS status) {
             switch (status) {
                 case UNAUTHORIZED:
-                    return new CMDS[]{
+                    return new CMDS[] {
                             CMDS.LOGIN,
                             CMDS.MSGGET,
                             CMDS.QUIT
                     };
-                case LOGGED_IN:
-                    return new CMDS[]{
-                            CMDS.MSGGET,
-                            CMDS.MSGSTORE,
-                            CMDS.LOGOUT,
-                            CMDS.QUIT
+                case AUTHORIZED:
+                    return new CMDS[] {
+                    		CMDS.MSGGET,
+                    		CMDS.MSGSTORE,
+                    		CMDS.LOGOUT,
+                    		CMDS.QUIT
                     };
                 default:
                     return new CMDS[0];
@@ -71,6 +75,6 @@ public class User {
     }
 
     public boolean isLoggedIn() {
-        return this.status == USER_STATUS.LOGGED_IN;
+        return this.status == USER_STATUS.AUTHORIZED;
     }
 }
