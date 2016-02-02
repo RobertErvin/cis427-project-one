@@ -15,15 +15,18 @@ public class SocketServer {
 	 * The view for the socket. This handles
 	 * incoming requests and outgoing responses.
 	 */
+    private static Boolean shutdown;
+    private static Socket socket;
 
     // Initialize the socket and start listening
     public static void main(String[] args) throws Exception {
         System.out.println("The server is running...");
-
+        shutdown = false;
         ServerSocket listener = new ServerSocket(9898);
         try {
             while (true) {
-                new CIS427SocketServer(listener.accept()).start();
+                socket = listener.accept();
+                new CIS427SocketServer(socket).start();
             }
         } finally {
             listener.close();
@@ -36,6 +39,8 @@ public class SocketServer {
         private UserService userService;
         private MotdService motdService;
         private boolean isMsgStore = false;
+        private BufferedReader in;
+        private PrintWriter out;
 
         // Initialize the variables
         public CIS427SocketServer(Socket socket) {
@@ -55,14 +60,14 @@ public class SocketServer {
         // Listen for the requests and handle them. Send corresponding responses.
         public void run() {
             try {
-                BufferedReader in = new BufferedReader(
+                in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                out = new PrintWriter(socket.getOutputStream(), true);
 
                 while (true) {
                     String input = in.readLine();
                     log(input);
-                    
+                    // log(motdService.getNext());
                     if (isMsgStore) { // Store a message
                         if (user.isLoggedIn()) {
                             try {
@@ -88,6 +93,7 @@ public class SocketServer {
                         }
                     } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                         try {
+                            System.out.println("Login");
                             user = userService.parseUserAuthData(input);
                             user = userService.authorize(user);
                             out.println(RESPONSES.OK.toString());
@@ -110,6 +116,8 @@ public class SocketServer {
                         if (user.isRoot()) {
                             try {
                                 shutdown();
+                                shutdown = true;
+                                break;
                             } catch (Exception e) {
                                 out.println(RESPONSES.FORMAT_ERROR.toString());
                             }
@@ -131,10 +139,13 @@ public class SocketServer {
         }
 
         private void shutdown() throws Exception {
+            out.println(RESPONSES.OK.toString());
+            out.close();
+            in.close();
             socket.close();
         }
 
-        private void log(String message) {
+        public static void log(String message) {
             System.out.println(message);
         }
     }

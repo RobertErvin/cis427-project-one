@@ -62,6 +62,7 @@ public class UserService {
                 if (user.getId().equals(userToAuth.getId()) &&
                         user.getPassword().equals(userToAuth.getPassword())) {
                     userToAuth.setStatus(User.USER_STATUS.AUTHORIZED);
+                    userToAuth.setRoot(user.isRoot());
                     return userToAuth;
                 }
             }
@@ -85,18 +86,15 @@ public class UserService {
     // Parse LOGIN userId and password to ensure it matches with the given format
     public User parseUserAuthData(String data) {
         User user = new User();
-        Pattern pattern = Pattern.compile("(LOGIN\\s(\\w+)\\s(\\w+))");
-        Matcher matcher = pattern.matcher(data);
-        if (!matcher.find() || matcher.groupCount() < 4) {
+        String[] credentials = data.split(" ");
+        if (credentials.length < 3 ) {
             throw new IllegalArgumentException();
         }
-
-        String userId = matcher.group(1);
-        String password = matcher.group(2);
+        String userId = credentials[1];
+        String password = credentials[2];
 
         user.setId(userId);
         user.setPassword(password);
-
         return user;
     }
 }
