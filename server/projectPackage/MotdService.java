@@ -35,6 +35,7 @@ public class MotdService {
 
     // Append a motd to the motd file
     private void writeToFile(String motd) throws IOException {
+        motd = "\n" + motd;
         Files.write(Paths.get(FILEPATH), motd.getBytes(), StandardOpenOption.APPEND);
     }
 

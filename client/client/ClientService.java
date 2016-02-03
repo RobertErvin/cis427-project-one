@@ -1,6 +1,7 @@
 package client;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Scanner;
 
 public class ClientService {
@@ -15,11 +16,19 @@ public class ClientService {
             System.out.println("Please input ip address as an argument");
             System.exit(0);
         }
-        socket = new SocketClient(args[0]);
-        
-        while (!quit){
-            displayOptions();
-            runCommands();
+        try {
+            socket = new SocketClient(args[0]);
+
+            while (!quit){
+                displayOptions();
+                runCommands();
+            }
+        } catch (ConnectException e){
+            System.out.println(e.getMessage());
+            System.out.println("Please run the server first or input the correct ip_address");
+            System.out.println("How to run: make ADDRESS=\"<address>\" ");
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
     
