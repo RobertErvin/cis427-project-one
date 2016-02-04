@@ -1,3 +1,5 @@
+//Purpose: Display client interface to perform certain funcitons
+
 package client;
 
 import java.io.IOException;
@@ -11,14 +13,16 @@ public class ClientService {
     private static String response;
     
     public static void main(String[] args) throws IOException {
-        // TODO code application logic here
+        //Getting the ip_address argument from command line
         if(args.length == 0){
             System.out.println("Please input ip address as an argument");
             System.exit(0);
         }
         try {
+            //creating connecting to the server
             socket = new SocketClient(args[0]);
-
+            
+            //keep conneection live until quit is true
             while (!quit){
                 displayOptions();
                 runCommands();
@@ -31,7 +35,7 @@ public class ClientService {
             e.printStackTrace();
         }
     }
-    
+    //Display options to the user
     public static void displayOptions(){
         System.out.println("Please choose one of the options:");
         System.out.println("1. MSGGET");
@@ -42,33 +46,40 @@ public class ClientService {
         System.out.println("6. QUIT");
     }
     
+    //Disconnect from the server
     public static void disconnect(){
         if(response.equals("200 OK")){
             quit = true;
         }
     }
-    
+    //Run commands based on the optin chosen by the user
     public static void runCommands() throws IOException{
         System.out.print("Please enter option number: ");
+        //Get input from the user
         Scanner input = new Scanner(System.in);
         switch(input.nextInt()){
             //MSGGET 
             case 1:
                 response = socket.MSGGET();
                 break;
+            //MSGSTORE
             case 2:
                 response = socket.MSGSTORE();
                 break; 
+            //LOGIN
             case 3:
                 response = socket.LOGIN();
                 break;
+            //LOGOUT
             case 4:
                 response = socket.LOGOUT();
                 break;
+            //SHUTDOWN
             case 5:
                 response = socket.SHUTDOWN();
                 disconnect();
                 break;
+            //QUIT
             case 6:
                 response = socket.QUIT();
                 disconnect();
