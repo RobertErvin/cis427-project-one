@@ -102,14 +102,15 @@ public class SocketClient {
     
     public static String readResponse() throws IOException{
         String response = "";
-        do{
-            //read response form server
-            String messege = br.readLine();
-            response+=messege;
-            //print response from server line by line
-            System.out.println("s: "+messege);
-        }while(br.ready());
+        String output = "";
+        String line;
+        while(!(line = br.readLine()).equals("exit") && line != null){
+            output += "s: " + line + "\n";
+            response += line;
+        }
         
+        System.out.println(output);
+                
         return response;
         
     }

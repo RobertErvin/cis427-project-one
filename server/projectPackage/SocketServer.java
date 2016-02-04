@@ -111,10 +111,12 @@ public class SocketServer {
                         }
                     } else if (input.equals(CMDS.QUIT.toString())) { // Quit
                         out.println(RESPONSES.OK.toString());
+                        out.println("exit");
                         break;
                     } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
                         if (user.isRoot()) {
                             try {
+                                out.println("exit");
                                 shutdown();
                                 shutdown = true;
                                 break;
@@ -124,7 +126,9 @@ public class SocketServer {
                         } else {
                             out.println(RESPONSES.BAD_PERMISSIONS_ERROR.toString());
                         }
-                    }
+                    };
+                    out.println("exit");
+
                 }
             } catch (IOException e) { // Something bad happened
                 log("Error handling client: " + e);
