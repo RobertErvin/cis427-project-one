@@ -24,10 +24,10 @@ public class SocketServer {
         shutdown = false;
         ServerSocket listener = new ServerSocket(9898);
         try {
-            while (true) {
-                socket = listener.accept();
-                new CIS427SocketServer(socket).start();
-            }
+            // while (true) {
+            socket = listener.accept();
+            new CIS427SocketServer(socket).start();
+            // }
         } finally {
             listener.close();
         }
@@ -116,7 +116,6 @@ public class SocketServer {
                     } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
                         if (user.isRoot()) {
                             try {
-                                out.println("exit");
                                 shutdown();
                                 shutdown = true;
                                 break;
@@ -126,7 +125,7 @@ public class SocketServer {
                         } else {
                             out.println(RESPONSES.BAD_PERMISSIONS_ERROR.toString());
                         }
-                    };
+                    }
                     out.println("exit");
 
                 }
@@ -144,9 +143,10 @@ public class SocketServer {
 
         private void shutdown() throws Exception {
             out.println(RESPONSES.OK.toString());
+            out.println("exit");
             out.close();
             in.close();
-            socket.close();
+            // socket.close();
         }
 
         public static void log(String message) {
