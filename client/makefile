@@ -23,7 +23,7 @@ MAIN = client/ClientService
 
 # typing 'make' will invoke the first target entry in the makefile 
 # (the default one in this case)
-default: classes run
+default: classes
 
 run: classes
 	$(JVM) $(MAIN) ${ADDRESS}

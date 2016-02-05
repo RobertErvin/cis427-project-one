@@ -54,10 +54,17 @@ public class ClientService {
     }
     //Run commands based on the optin chosen by the user
     public static void runCommands() throws IOException{
-        System.out.print("Please enter option number: ");
-        //Get input from the user
+        int choice = 9;
         Scanner input = new Scanner(System.in);
-        switch(input.nextInt()){
+        System.out.print("Please enter option number: ");
+        try{
+            choice = input.nextInt();
+        }catch(Exception e){
+            //a wrong choice that will ask the client to enter a number again
+            choice = 9;
+        }
+        
+        switch(choice){
             //MSGGET 
             case 1:
                 response = socket.MSGGET();
