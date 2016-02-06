@@ -15,22 +15,20 @@ public class SocketServer {
 	 * The view for the socket. This handles
 	 * incoming requests and outgoing responses.
 	 */
-    private static Boolean shutdown;
     private static Socket socket;
 
     // Initialize the socket and start listening
     public static void main(String[] args) throws Exception {
         System.out.println("The server is running...");
-        shutdown = false;
+
         ServerSocket listener = new ServerSocket(9898);
-        try {
-            // while (true) {
-            socket = listener.accept();
-            new CIS427SocketServer(socket).start();
-            // }
-        } finally {
+        try { 
+            while (true) { 
+                new CIS427SocketServer(listener.accept()).start();
+            } 
+        } finally { 
             listener.close();
-        }
+        } 
     }
 
     private static class CIS427SocketServer extends Thread {
@@ -67,7 +65,11 @@ public class SocketServer {
                 while (true) {
                     String input = in.readLine();
                     log(input);
-                    // log(motdService.getNext());
+
+                    if (input == null) {
+                    	return;
+                    }
+                    
                     if (isMsgStore) { // Store a message
                         if (user.isLoggedIn()) {
                             try {
@@ -93,7 +95,6 @@ public class SocketServer {
                         }
                     } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                         try {
-                            System.out.println("Login");
                             user = userService.parseUserAuthData(input);
                             user = userService.authorize(user);
                             out.println(RESPONSES.OK.toString());
@@ -111,13 +112,10 @@ public class SocketServer {
                         }
                     } else if (input.equals(CMDS.QUIT.toString())) { // Quit
                         out.println(RESPONSES.OK.toString());
-                        out.println("exit");
-                        break;
                     } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
-                        if (user.isRoot()) {
+                        if (user.isLoggedIn() && user.isRoot()) {
                             try {
                                 shutdown();
-                                shutdown = true;
                                 break;
                             } catch (Exception e) {
                                 out.println(RESPONSES.FORMAT_ERROR.toString());
@@ -126,8 +124,8 @@ public class SocketServer {
                             out.println(RESPONSES.BAD_PERMISSIONS_ERROR.toString());
                         }
                     }
+                    
                     out.println("exit");
-
                 }
             } catch (IOException e) { // Something bad happened
                 log("Error handling client: " + e);
@@ -143,10 +141,12 @@ public class SocketServer {
 
         private void shutdown() throws Exception {
             out.println(RESPONSES.OK.toString());
+            
             out.println("exit");
             out.close();
             in.close();
-            // socket.close();
+            socket.close();
+            System.exit(0);
         }
 
         public static void log(String message) {
