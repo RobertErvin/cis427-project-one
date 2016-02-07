@@ -29,8 +29,15 @@ public class MotdService {
 
     // Get the next motd
     public String getNext() {
-        lastMotdIndex = motds.size() > lastMotdIndex + 1 ? lastMotdIndex + 1: -1;
-        return motds.get(lastMotdIndex + 1);
+    	System.out.println("Motd Size: " + motds.size());
+    	System.out.println("lastIndexBefore: " + lastMotdIndex);
+    	
+        lastMotdIndex = motds.size() > lastMotdIndex + 1 ? lastMotdIndex + 1: 0;
+        
+        System.out.println("lastIndexAfter: " + lastMotdIndex);
+        System.out.println("Motd: " + motds.get(lastMotdIndex));
+        
+        return motds.get(lastMotdIndex);
     }
 
     // Append a motd to the motd file
@@ -46,11 +53,16 @@ public class MotdService {
 
         try {
             String motd = br.readLine();
-            motds.add(motd);
-
-            while (motd != null) {
-                motd = br.readLine();
-                motds.add(motd);
+            if (motd != null) {
+	            motds.add(motd);
+	
+	            while (motd != null) {
+	                motd = br.readLine();
+	                
+	                if (motd != null) {
+	                	motds.add(motd);
+	                }
+	            }
             }
         } finally {
             br.close();

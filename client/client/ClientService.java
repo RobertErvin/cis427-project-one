@@ -14,13 +14,13 @@ public class ClientService {
     
     public static void main(String[] args) throws IOException {
         //Getting the ip_address argument from command line
-        if(args.length == 0){
-            System.out.println("Please input ip address as an argument");
-            System.exit(0);
-        }
+//        if(args.length == 0){
+//            System.out.println("Please input ip address as an argument");
+//            System.exit(0);
+//        }
         try {
             //creating connecting to the server
-            socket = new SocketClient(args[0]);
+            socket = new SocketClient("127.0.0.1");
             
             //keep conneection live until quit is true
             while (!quit){
