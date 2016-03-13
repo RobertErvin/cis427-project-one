@@ -31,15 +31,15 @@ public class ChildThread extends Thread {
 		    new OutputStreamWriter(socket.getOutputStream()));
 		this.socket = socket;
 		this.user = new User();
-		this.userService = new UserService();
+		this.userService = UserService.getInstance();
 		
-		  try {
-		      this.motdService = new MotdService();
-		  } catch (Exception e) {
-		      log(e.getMessage());
-		  }
+		try {
+			this.motdService = new MotdService();
+		} catch (Exception e) {
+			log(e.getMessage());
+		}
 		
-		  log("New connection with client at " + socket);
+		log("New connection with client at " + socket);
     }
 
     public void run() {
@@ -88,6 +88,7 @@ public class ChildThread extends Thread {
                             log(e.getMessage());
                         }
                     } else {
+                    	log(RESPONSES.LOGIN_ERROR.toString());
                         out.println(RESPONSES.LOGIN_ERROR.toString());
                     }
                 } else if (input.equals(CMDS.WHO.toString())) { // Request to list authorized users
@@ -102,6 +103,7 @@ public class ChildThread extends Thread {
                 	
                 	if (userService.isUserLoggedIn(userId)) {
                 		sendMsgUserId = userId;
+                		isSendMsg = true;
                 		out.println(RESPONSES.OK.toString());
                 	} else {
                 		out.println(RESPONSES.INVALID_RECEIVER_ERROR.toString());
@@ -119,8 +121,9 @@ public class ChildThread extends Thread {
                     }
                 } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                     try {
-                        user = userService.parseUserAuthData(input, socket.getInetAddress().toString());
+                        user = userService.parseUserAuthData(input, socket.getInetAddress().getHostAddress());
                         user = userService.authorize(user);
+                        log(RESPONSES.OK.toString());
                         out.println(RESPONSES.OK.toString());
                     } catch (IllegalArgumentException e) {
                         out.println(RESPONSES.BAD_USERNAME_OR_PASSWORD_ERROR.toString());
@@ -174,7 +177,7 @@ public class ChildThread extends Thread {
         for (int i = 0; i < handlers.size(); i++) {	
 		    synchronized(handlers) {
 				ChildThread handler = (ChildThread) handlers.elementAt(i);
-			    handler.out.println("s: " + RESPONSES.SHUTDOWN_MESSAGE);
+			    handler.out.println(RESPONSES.SHUTDOWN_MESSAGE);
 			    handler.out.println("exit");
 			    handler.out.flush();
 		    }

@@ -37,9 +37,9 @@ public class Constants {
 				case 5:
 					return "402 User not allowed to execute this command.";
 				case 6:
-					return "Initial Receiver Error";
+					return "420 either the user does not exist or is not logged in";
 				case 7:
-					return "SHUTDOWN_MESSAGE";
+					return "210 the server is about to shutdown ……";
 				default:
 					return "";
 					

@@ -13,10 +13,19 @@ import server.User;
 public class UserService {
     private ArrayList<User> users;
     private ArrayList<User> activeUsers;
+    private static UserService instance;
 
     public UserService() {
         this.users = initializeUsers();
         this.activeUsers = new ArrayList<User>();
+    }
+    
+    public static UserService getInstance() {
+    	if (instance == null) {
+    		instance = new UserService();
+    	}
+    	
+    	return instance;
     }
 
     public boolean hasPermission(User user, CMDS command) {
