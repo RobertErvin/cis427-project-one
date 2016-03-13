@@ -1,4 +1,4 @@
-package projectPackage;
+package server;
 
 /* 
  * ChildThread.java
@@ -8,8 +8,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Vector;
 
-import projectPackage.Constants.CMDS;
-import projectPackage.Constants.RESPONSES;
+import server.Constants.CMDS;
+import server.Constants.RESPONSES;
 
 public class ChildThread extends Thread {
     static Vector<ChildThread> handlers = new Vector<ChildThread>(20);
@@ -29,6 +29,17 @@ public class ChildThread extends Thread {
 		    new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(
 		    new OutputStreamWriter(socket.getOutputStream()));
+		this.socket = socket;
+		this.user = new User();
+		this.userService = new UserService();
+		
+		  try {
+		      this.motdService = new MotdService();
+		  } catch (Exception e) {
+		      log(e.getMessage());
+		  }
+		
+		  log("New connection with client at " + socket);
     }
 
     public void run() {
@@ -108,7 +119,7 @@ public class ChildThread extends Thread {
                     }
                 } else if (input.contains(CMDS.LOGIN.toString())) { // Login
                     try {
-                        user = userService.parseUserAuthData(input, socket.getInetAddress().getHostAddress());
+                        user = userService.parseUserAuthData(input, socket.getInetAddress().toString());
                         user = userService.authorize(user);
                         out.println(RESPONSES.OK.toString());
                     } catch (IllegalArgumentException e) {

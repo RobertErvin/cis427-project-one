@@ -1,5 +1,4 @@
-package projectPackage;
-
+package server;
 public class Constants {
 	public enum CMDS {
         MSGGET,
@@ -7,7 +6,9 @@ public class Constants {
         SHUTDOWN,
         LOGIN,
         LOGOUT,
-        QUIT
+        QUIT,
+        WHO,
+        SEND
     }
 	
 	public enum RESPONSES {
@@ -16,7 +17,9 @@ public class Constants {
 		LOGOUT_ERROR,
 		FORMAT_ERROR,
 		BAD_USERNAME_OR_PASSWORD_ERROR,
-		BAD_PERMISSIONS_ERROR;
+		BAD_PERMISSIONS_ERROR,
+		INVALID_RECEIVER_ERROR,
+		SHUTDOWN_MESSAGE;
 		
 		@Override
 		public String toString() {
@@ -33,6 +36,10 @@ public class Constants {
 					return "410 Wrong UserID or Password";
 				case 5:
 					return "402 User not allowed to execute this command.";
+				case 6:
+					return "Initial Receiver Error";
+				case 7:
+					return "SHUTDOWN_MESSAGE";
 				default:
 					return "";
 					

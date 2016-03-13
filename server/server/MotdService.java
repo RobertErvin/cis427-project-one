@@ -1,5 +1,6 @@
-package projectPackage;
+package server;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,10 +15,12 @@ public class MotdService {
     public ArrayList<String> motds = new ArrayList<>();
     public int lastMotdIndex = -1;
 
-    private final String FILEPATH = "motds.txt";
+    private final String FILEPATH = "server/motds.txt";
 
     // Get all stored motds on initialization
     public MotdService() throws Exception {
+    	System.out.println(new File(FILEPATH).getAbsolutePath());
+    	
         this.motds = readFromFile();
     }
 

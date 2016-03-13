@@ -1,24 +1,26 @@
-package projectPackage;
+package server;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import projectPackage.Constants.CMDS;
-import projectPackage.User;
+import server.Constants.CMDS;
+import server.User;
 
 /*
  * Responsible for user-specific business logic
  */
 public class UserService {
     private ArrayList<User> users;
+    private ArrayList<User> activeUsers;
 
     public UserService() {
         this.users = initializeUsers();
+        this.activeUsers = new ArrayList<User>();
     }
 
     public boolean hasPermission(User user, CMDS command) {
-        for (CMDS cmd: User.USER_STATUS.getPermissions(user.getStatus())) {
+        for (server.Constants.CMDS cmd: User.USER_STATUS.getPermissions(user.getStatus())) {
             if (cmd == command) {
                 return true;
             }
@@ -63,6 +65,7 @@ public class UserService {
                         user.getPassword().equals(userToAuth.getPassword())) {
                     userToAuth.setStatus(User.USER_STATUS.AUTHORIZED);
                     userToAuth.setRoot(user.isRoot());
+                    activeUsers.add(userToAuth);
                     return userToAuth;
                 }
             }
@@ -72,19 +75,42 @@ public class UserService {
 
         throw new IllegalAccessError("User doesn't have permission to login.");
     }
+    
+    public boolean isUserLoggedIn(String userId) {
+    	for (User user: activeUsers) {
+    		if (user.getId().equals(userId)) {
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
 
     // Logout the user
     public User logout(User userToLogout) {
         if (hasPermission(userToLogout, CMDS.LOGOUT)) {
             userToLogout.setStatus(User.USER_STATUS.UNAUTHORIZED);
+            activeUsers.remove(userToLogout);
             return userToLogout;
         }
 
         throw new IllegalAccessError("User doesn't have permission to logout.");
     }
     
+    public ArrayList<User> getAllActiveUsers() {
+    	return activeUsers;
+    }
+    
+    public String parseUserId(String data) {
+    	String[] credentials = data.split(" ");
+        if (credentials.length < 2 ) {
+            throw new IllegalArgumentException();
+        }
+        return credentials[1];
+    }
+    
     // Parse LOGIN userId and password to ensure it matches with the given format
-    public User parseUserAuthData(String data) {
+    public User parseUserAuthData(String data, String iNetAddress) {
         User user = new User();
         String[] credentials = data.split(" ");
         if (credentials.length < 3 ) {
@@ -95,6 +121,7 @@ public class UserService {
 
         user.setId(userId);
         user.setPassword(password);
+        user.setIpAddress(iNetAddress);
         return user;
     }
 }

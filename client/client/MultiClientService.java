@@ -18,7 +18,7 @@ public class MultiClientService {
     
     public static void main(String args[]) throws IOException
     {
-        try{
+        try {
             channel= new Socket ("127.0.0.1", 9898);
             Thread thread1 = new Thread(new Clistener(channel));
             thread1.start();
@@ -31,7 +31,7 @@ public class MultiClientService {
             System.err.println("Exception: " + e.getMessage());
             System.exit(1);
         }
-    }     
+    }
 }
 
 class Clistener implements Runnable

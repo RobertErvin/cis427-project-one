@@ -1,6 +1,6 @@
-package projectPackage;
+package server;
 
-import projectPackage.Constants.CMDS;
+import server.Constants.CMDS;
 
 /*
  * Responsible for all user-specific in-memory storage
@@ -35,6 +35,7 @@ public class User {
     private String id;
     private String password;
     private USER_STATUS status;
+    private String ipAddress;
     private boolean isRoot;
 
     public User() {
@@ -77,4 +78,12 @@ public class User {
     public boolean isLoggedIn() {
         return this.status == USER_STATUS.AUTHORIZED;
     }
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
 }
