@@ -173,6 +173,7 @@ public class ChildThread extends Thread {
     
     private void shutdown() throws Exception {
         out.println(RESPONSES.OK.toString());
+        out.println("exit");
         
         for (int i = 0; i < handlers.size(); i++) {	
 		    synchronized(handlers) {

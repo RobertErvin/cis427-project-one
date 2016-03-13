@@ -39,7 +39,7 @@ public class Constants {
 				case 6:
 					return "420 either the user does not exist or is not logged in";
 				case 7:
-					return "210 the server is about to shutdown ……";
+					return "210 the server is about to shutdown……";
 				default:
 					return "";
 					

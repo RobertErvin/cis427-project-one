@@ -94,7 +94,13 @@ class Cconsole implements Runnable {
                 
                 if (input != null) {
                     out.println(input);
-                    System.out.println("Sent: " + input);
+                    String response = readResponse();
+                    
+                    if (input.equals("QUIT") && response.equals("200 OK")) {
+                    	quit = true;
+                    } else if (response.equals("210 the server is about to shutdown……")) {
+                    	quit = true;
+                    }
                 }
             }
             
@@ -105,6 +111,21 @@ class Cconsole implements Runnable {
             System.out.println("Exception: " + e.getMessage());
         }
     }
+    
+    public static String readResponse() throws IOException{
+        String response = "";
+        String output = "";
+        String line;
+        while(!(line = in.readLine()).equals("exit") && line != null){
+            output += "s: " + line + "\n";
+            response += line;
+        } 
+         
+        System.out.println(output);
+                 
+        return response;
+         
+    } 
 }
 
 
