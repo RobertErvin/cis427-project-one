@@ -124,8 +124,7 @@ public class SocketServer {
                             out.println(RESPONSES.BAD_PERMISSIONS_ERROR.toString());
                         }
                     }
-                    
-                    out.println("exit");
+
                 }
             } catch (IOException e) { // Something bad happened
                 log("Error handling client: " + e);
