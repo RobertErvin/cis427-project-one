@@ -16,13 +16,15 @@ JFLAGS = -g
 .java.class: ; $(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	projectPackage/Constants.java \
-	projectPackage/User.java \
-	projectPackage/MotdService.java \
-	projectPackage/UserService.java \
-	projectPackage/SocketServer.java
+	server/Constants.java \
+	server/User.java \
+	server/MotdService.java \
+	server/UserService.java \
+	server/ChildThread.java \
+	server/MultithreadedSocketServer.java
+	
 
-MAIN = projectPackage/SocketServer
+MAIN = server/MultithreadedSocketServer
 
 # typing 'make' will invoke the first target entry in the makefile 
 # (the default one in this case)

@@ -68,6 +68,8 @@ public class ChildThread extends Thread {
                 } else if (isSendMsg) {
                 	if (user.isLoggedIn()) {
                         try {
+                        	
+                        	// Notify the user if they're active
                         	for (int i = 0; i < handlers.size(); i++) {	
             				    synchronized(handlers) {
             						ChildThread handler = (ChildThread) handlers.elementAt(i);
@@ -88,7 +90,6 @@ public class ChildThread extends Thread {
                             log(e.getMessage());
                         }
                     } else {
-                    	log(RESPONSES.LOGIN_ERROR.toString());
                         out.println(RESPONSES.LOGIN_ERROR.toString());
                     }
                 } else if (input.equals(CMDS.WHO.toString())) { // Request to list authorized users
@@ -98,6 +99,8 @@ public class ChildThread extends Thread {
                     for (User user: userService.getAllActiveUsers()) {
                     	out.println(user.getId() + "\t" + user.getIpAddress());
                     }
+                    
+                    out.flush();
                 } else if (input.contains(CMDS.SEND.toString())) { // Request to send a message
                 	String userId = userService.parseUserId(input);
                 	
@@ -123,7 +126,6 @@ public class ChildThread extends Thread {
                     try {
                         user = userService.parseUserAuthData(input, socket.getInetAddress().getHostAddress());
                         user = userService.authorize(user);
-                        log(RESPONSES.OK.toString());
                         out.println(RESPONSES.OK.toString());
                     } catch (IllegalArgumentException e) {
                         out.println(RESPONSES.BAD_USERNAME_OR_PASSWORD_ERROR.toString());
@@ -138,6 +140,10 @@ public class ChildThread extends Thread {
                         out.println(RESPONSES.LOGIN_ERROR.toString());
                     }
                 } else if (input.equals(CMDS.QUIT.toString())) { // Quit
+                	if (user.isLoggedIn()) {
+                		user = userService.logout(user);
+                	}
+                	
                     out.println(RESPONSES.OK.toString());
                 } else if (input.equals(CMDS.SHUTDOWN.toString())) { // Shutdown
                     if (user.isLoggedIn() && user.isRoot()) {
@@ -152,7 +158,7 @@ public class ChildThread extends Thread {
                     }
                 }
                 
-                out.println("exit");
+				out.flush();
 		    }
 		} catch(IOException ioe) {
 		    ioe.printStackTrace();
@@ -171,15 +177,15 @@ public class ChildThread extends Thread {
 		}
     }
     
+    // Shutdown the server after notifying all children
     private void shutdown() throws Exception {
         out.println(RESPONSES.OK.toString());
-        out.println("exit");
+        out.flush();
         
         for (int i = 0; i < handlers.size(); i++) {	
 		    synchronized(handlers) {
 				ChildThread handler = (ChildThread) handlers.elementAt(i);
 			    handler.out.println(RESPONSES.SHUTDOWN_MESSAGE);
-			    handler.out.println("exit");
 			    handler.out.flush();
 		    }
 		}

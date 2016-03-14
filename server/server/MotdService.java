@@ -19,8 +19,6 @@ public class MotdService {
 
     // Get all stored motds on initialization
     public MotdService() throws Exception {
-    	System.out.println(new File(FILEPATH).getAbsolutePath());
-    	
         this.motds = readFromFile();
     }
 
